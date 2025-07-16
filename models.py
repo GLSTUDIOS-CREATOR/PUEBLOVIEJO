@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 
-# models.py - Define tus modelos con relaciones correctas
-
 # Instancia única de la extensión
 db = SQLAlchemy()
 
@@ -17,13 +15,16 @@ class Sorteo(db.Model):
     activo        = db.Column(db.Boolean, default=False)
     generado      = db.Column(db.Boolean, default=False)
 
+    # NUEVO CAMPO PARA CORREGIR EL ERROR
+    premio_gordo  = db.Column(db.String(100), nullable=True)
+
     # Relación con planillas y órdenes
     planillas = db.relationship(
         'Planilla',
         back_populates='sorteo',
         cascade='all, delete-orphan'
     )
-    orders    = db.relationship(
+    orders = db.relationship(
         'DailyOrder',
         back_populates='sorteo',
         cascade='all, delete-orphan'
@@ -31,6 +32,7 @@ class Sorteo(db.Model):
 
     def __repr__(self):
         return f"<Sorteo {self.codigo} - {self.nombre}>"
+
 
 class Vendedor(db.Model):
     __tablename__ = 'vendedores'
@@ -47,6 +49,7 @@ class Vendedor(db.Model):
 
     def __repr__(self):
         return f"<Vendedor {self.nombre}>"
+
 
 class Planilla(db.Model):
     __tablename__ = 'planillas'
@@ -74,6 +77,7 @@ class Planilla(db.Model):
             f"sorteo:{self.sorteo_id} vendido:{self.vendido} on {self.fecha_asig}>"
         )
 
+
 class DailyOrder(db.Model):
     __tablename__ = 'daily_orders'
 
@@ -98,3 +102,5 @@ class DailyOrder(db.Model):
             f"first:{self.first_ticket} last:{self.last_ticket} "
             f"imp:{self.impresos} vend:{self.vendidos} dev:{self.devoluciones}>"
         )
+
+
