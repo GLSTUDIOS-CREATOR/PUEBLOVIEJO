@@ -7,3 +7,5 @@ reportlab
 PyPDF2
 requests
 flask_sqlalchemy
+openpyxl
+
