@@ -546,7 +546,7 @@ per_cell_offsets = {
 @login_required
 def impresion():
     # ── Listado de series y reintegros disponibles ──
-    files      = sorted(f for f in os.listdir(DATA_DIR) if f.lower().endswith(('.xlsx','.csv')))
+    files      = sorted(f for f in os.listdir(DATA_DIR) if f.lower().endswith(('.xlsx')))
     series     = [(f, SERIE_MAP.get(f, f)) for f in files]
     reintegros = sorted(f for f in os.listdir(REINTEGROS_DIR) if f.lower().endswith('.png'))
     fecha_hoy  = date.today().strftime('%Y-%m-%d')
