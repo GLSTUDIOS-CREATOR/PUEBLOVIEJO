@@ -24,6 +24,8 @@ from PyPDF2 import PdfMerger
 
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Sorteo, Vendedor, Planilla, DailyOrder
+import flask
+import requests
 
 
 
