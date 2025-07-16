@@ -24,8 +24,6 @@ from PyPDF2 import PdfMerger
 
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Sorteo, Vendedor, Planilla, DailyOrder
-import flask
-import requests
 
 
 
@@ -426,135 +424,46 @@ def ultimos_movimientos():
     m = cargar_movimientos(); m.reverse()
     return render_template('ultimos_movimientos.html', movimientos=m)
 
-# ─── SORTEOS (CRUD con SQLAlchemy) ───────────────────────────
 
-@app.route('/sorteos', methods=['GET','POST'])
+
+@app.route('/sorteos')
 @requiere_rol('superadmin','admin')
 def vista_sorteos():
-    if request.method=='POST':
-        f=request.form
-        s=Sorteo(
-            codigo=f['codigo'],
-            nombre=f['nombre'],
-            fecha_evento=datetime.strptime(f['fecha_evento'],'%Y-%m-%d').date(),
-            premio_gordo=Decimal(f['premio_gordo']),
-            plantilla=f.get('plantilla')
-        )
-        db.session.add(s)
-        db.session.commit()
-        flash('Sorteo creado','success')
-        return redirect(url_for('vista_sorteos'))
-
     sorteos = Sorteo.query.order_by(Sorteo.fecha_evento.desc()).all()
     return render_template('sorteos.html', sorteos=sorteos)
 
 
-@app.route('/activar_sorteo/<int:sorteo_id>', methods=['POST'])
-@requiere_rol('superadmin', 'admin')
-def activar_sorteo(sorteo_id):
-    # Desactivar todos los sorteos
-    Sorteo.query.update({Sorteo.activo: False})
-    # Activar el seleccionado
-    s = Sorteo.query.get_or_404(sorteo_id)
-    s.activo = True
-    db.session.commit()
-
-    flash('Sorteo activado', 'success')
-    return redirect(url_for('vista_sorteos'))
 
 
 
-from decimal import Decimal
-from models import Sorteo, Vendedor  # si no lo tenías ya importado
-
-#CREAR SORTEO REVISAR EL CODIGO #
-
-@app.route('/crear_dia_sorteo')
-@login_required
-def crear_dia_sorteo():
-    return render_template('crear_dia_sorteo.html')
-
-
-
-
-@app.route('/sorteos/nuevo', methods=['GET', 'POST'])
-@requiere_rol('superadmin','admin')
-def nuevo_sorteo():
-    if request.method == 'POST':
-        # 1) Recoger datos
-        codigo      = request.form['codigo'].strip()
-        nombre      = request.form['nombre'].strip()
-        fecha_str   = request.form['fecha_evento']
-        premio_str  = request.form['premio_gordo']
-        plantilla   = request.form.get('plantilla','').strip() or None
-
-        # 2) Convertirlos
-        fecha_evento = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        premio_gordo = Decimal(premio_str)
-
-        # 3) Persistir en la BD
-        s = Sorteo(
-            codigo=codigo,
-            nombre=nombre,
-            fecha_evento=fecha_evento,
-            premio_gordo=premio_gordo,
-            plantilla=plantilla
-        )
-        db.session.add(s)
-        db.session.commit()
-
-        flash('Sorteo creado correctamente','success')
-        return redirect(url_for('vista_sorteos'))
-
-    # GET → renderiza el formulario
-    vendedores = Vendedor.query.order_by(Vendedor.nombre).all()
-    return render_template('nuevo_sorteo.html',
-                           vendedores=vendedores,
-                           usuario=session['usuario'],
-                           rol=session['rol'],
-                           avatar=session['avatar'],
-                           permisos=session['permisos'])
-
-
-from flask import abort
-
-# ─── EDITAR SORTEO ────────────────────────────────────────────
-@app.route('/sorteos/editar/<int:sorteo_id>', methods=['GET','POST'])
-@requiere_rol('superadmin','admin')
-def editar_sorteo(sorteo_id):
-    s = Sorteo.query.get_or_404(sorteo_id)
-
-    if request.method == 'POST':
-        s.codigo       = request.form['codigo'].strip()
-        s.nombre       = request.form['nombre'].strip()
-        s.fecha_evento = datetime.strptime(request.form['fecha_evento'], '%Y-%m-%d').date()
-        s.premio_gordo = Decimal(request.form['premio_gordo'])
-        s.plantilla    = request.form.get('plantilla','').strip() or None
-
-        db.session.commit()
-        flash('Sorteo actualizado','success')
-        return redirect(url_for('vista_sorteos'))
-
-    # GET: muestro form con datos cargados
-    return render_template('editar_sorteo.html', sorteo=s,
-                           usuario=session['usuario'],
-                           rol=session['rol'],
-                           avatar=session['avatar'],
-                           permisos=session['permisos'])
-
-
-# ─── ELIMINAR SORTEO ─────────────────────────────────────────
-@app.route('/sorteos/eliminar/<int:sorteo_id>', methods=['POST'])
-@requiere_rol('superadmin','admin')
-def eliminar_sorteo(sorteo_id):
-    s = Sorteo.query.get_or_404(sorteo_id)
-    db.session.delete(s)
-    db.session.commit()
-    flash('Sorteo eliminado','warning')
-    return redirect(url_for('vista_sorteos'))
-
-
-
+# ─── (DESACTIVADO) CREAR SORTEO ───────────────────────────────────────────────
+# @app.route('/sorteos/nuevo', methods=['GET', 'POST'])
+# @requiere_rol('superadmin', 'admin')
+# def nuevo_sorteo():
+#     if request.method == 'POST':
+#         try:
+#             codigo     = request.form['codigo'].strip()
+#             nombre     = request.form['nombre'].strip()
+#             fecha_str  = request.form['fecha_evento']
+#             premio_str = request.form['premio_gordo']
+#             fecha_evento = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+#             premio_gordo = Decimal(premio_str)
+#             s = Sorteo(
+#                 codigo=codigo,
+#                 nombre=nombre,
+#                 fecha_evento=fecha_evento,
+#                 premio_gordo=premio_gordo
+#             )
+#             db.session.add(s)
+#             db.session.commit()
+#             flash('Sorteo creado correctamente', 'success')
+#             return redirect(url_for('vista_sorteos'))
+#         except Exception as e:
+#             db.session.rollback()
+#             flash(f'Error al crear sorteo: {e}', 'danger')
+#             return redirect(url_for('vista_sorteos'))
+#
+#     # GET → render_template('nuevo_sorteo.html', …)
 
 
 
@@ -637,7 +546,7 @@ per_cell_offsets = {
 @login_required
 def impresion():
     # ── Listado de series y reintegros disponibles ──
-    files      = sorted(f for f in os.listdir(DATA_DIR) if f.lower().endswith(('.xlsx')))
+    files      = sorted(f for f in os.listdir(DATA_DIR) if f.lower().endswith(('.xlsx','.csv')))
     series     = [(f, SERIE_MAP.get(f, f)) for f in files]
     reintegros = sorted(f for f in os.listdir(REINTEGROS_DIR) if f.lower().endswith('.png'))
     fecha_hoy  = date.today().strftime('%Y-%m-%d')
@@ -679,47 +588,21 @@ def impresion():
                 flash(f'Boleto final “{end}” no existe.', 'danger')
                 return redirect(url_for('impresion'))
 
-            # construyo mi subconjunto
             ids       = all_ids[s_idx:e_idx]
             registros = df[df[df.columns[0]].astype(str).isin(ids)].to_dict('records')
 
-            # Registro en DailyOrder (igual que antes)
-            dt = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-            sorteo = Sorteo.query.filter_by(fecha_evento=dt).first()
-            if not sorteo:
-                flash(f'No existe un sorteo para {fecha_str}', 'danger')
-                return redirect(url_for('impresion'))
-
-            order = DailyOrder.query.filter_by(sorteo_id=sorteo.id, date=dt).first()
-            if not order:
-                order = DailyOrder(
-                    sorteo_id    = sorteo.id,
-                    date         = dt,
-                    first_ticket = ids[0],
-                    last_ticket  = ids[-1],
-                    impresos     = len(ids),
-                    vendidos     = 0,
-                    devoluciones = 0
-                )
-                db.session.add(order)
-            else:
-                # expando rango si es necesario
-                if ids[0] < order.first_ticket:
-                    order.first_ticket = ids[0]
-                if ids[-1] > order.last_ticket:
-                    order.last_ticket  = ids[-1]
-                order.impresos += len(ids)
-            db.session.commit()
-
-            # Generar y enviar PDF de boletos (ahora usa 'ids' para la numeración real)
+            # ── YA NO BUSCAMOS SORTEO NI CREAMOS DailyOrder ──
+            # Generar y enviar PDF de boletos
             buf_b = generar_pdf_boletos_excel(
                 ids, registros, valor, telefono,
                 serie_archivo, rein_esp, cntesp,
                 reintegros, incA, fecha_str
             )
-            return send_file(buf_b,
-                             download_name='boletos_bingo.pdf',
-                             as_attachment=True)
+            return send_file(
+                buf_b,
+                download_name='boletos_bingo.pdf',
+                as_attachment=True
+            )
 
         # ── PLANILLA ───────────────────────────────────────────
         elif form_type == 'planilla':
@@ -738,7 +621,6 @@ def impresion():
             ids_p   = all_ids[inicio-1:fin]
 
             # 2) Genero un PDF por cada bloque de 40 y los uno
-            from PyPDF2 import PdfMerger
             merger = PdfMerger()
             chunk_size = 40
             total = len(ids_p)
@@ -750,7 +632,7 @@ def impresion():
                 buf = generar_pdf_planilla(
                     sub_ids,
                     archivo,
-                    session['usuario'],   # o quien corresponda
+                    session['usuario'],
                     fecha_p,
                     page_start,
                     page_end,
@@ -758,7 +640,6 @@ def impresion():
                 )
                 merger.append(buf)
 
-            # 3) Mando el PDF completo
             salida = BytesIO()
             merger.write(salida)
             salida.seek(0)
@@ -768,10 +649,9 @@ def impresion():
                 as_attachment=True
             )
 
-
         # ── ZIP (ambos) ────────────────────────────────────────
         elif form_type == 'zip':
-            # ... tu código de ZIP sin tocarlo ...
+            # ... código ZIP tal como lo tenías ...
             pass
 
     # ─ GET / formulario ───────────────────────────────────────
@@ -1087,6 +967,14 @@ def not_found(e):
 # ─── RUN SERVER ─────────────────────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
+
+
+
 
 
 
