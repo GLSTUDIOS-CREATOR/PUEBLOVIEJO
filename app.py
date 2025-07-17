@@ -513,7 +513,7 @@ COLUMNAS       = 2
 FILAS          = 4
 
 SIZE_NUM       = 20
-SIZE_INFO      = 10
+SIZE_INFO      = 8
 SIZE_VALOR     = 15
 REINTEGRO_W    = 41
 REINTEGRO_H    = 41
