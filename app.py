@@ -512,7 +512,7 @@ ESPACIO_Y      = 85
 COLUMNAS       = 2
 FILAS          = 4
 
-SIZE_NUM       = 20
+SIZE_NUM       = 18
 SIZE_INFO      = 9
 SIZE_VALOR     = 15
 REINTEGRO_W    = 41
