@@ -535,10 +535,10 @@ per_cell_offsets = {
     1: {"grid_x": -55,   "grid_y": 37,   "info_x": 60,   "info_y": 60,   "rein_x":  -5,   "rein_y": 20},
     2: {"grid_x": -20,   "grid_y": 90,   "info_x": 100,   "info_y": 110,   "rein_x": 40,   "rein_y": -25},
     3: {"grid_x": -55,   "grid_y": 90,   "info_x": 60,   "info_y": 110,   "rein_x":  -5,   "rein_y": -30},
-    4: {"grid_x": -20,   "grid_y": 140,   "info_x": 100,   "info_y": 170,   "rein_x": 40,   "rein_y": -80},
+    4: {"grid_x": -20,   "grid_y": 140,   "info_x": 100,   "info_y": 160,   "rein_x": 40,   "rein_y": -80},
     5: {"grid_x": -55,   "grid_y": 140,   "info_x": 60,   "info_y": 160,   "rein_x":  -5,   "rein_y": -80},
     6: {"grid_x": -20,   "grid_y": 190,   "info_x": 100,   "info_y": 210,   "rein_x": 40,   "rein_y": -130},
-    7: {"grid_x": -60,   "grid_y": 190,   "info_x": 60,   "info_y": 210,   "rein_x":  -5,   "rein_y": -130},
+    7: {"grid_x": -50,   "grid_y": 190,   "info_x": 60,   "info_y": 210,   "rein_x":  -5,   "rein_y": -130},
 }
 
 
